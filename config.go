@@ -29,10 +29,11 @@ To tweak existing projects use:
 	reset
 
 To download/upload projects use:
-	cast [url]
-	draw [url]
+	cast [url] - Downloads a project from the given url
+	draw [url] - Uploads the project or project alterations to the given url
 `
 	DO_NOT_EDIT_THIS_FOLDER_CONTENTS = "Do not manually change anything in this folder as it may result in file corruption or bugs in the version control."
+	ROOT                             = ".magikit"
 )
 
 func firstTimeSetup() error {
@@ -46,7 +47,6 @@ func firstTimeSetup() error {
 	fmt.Print("First name: ")
 	r := bufio.NewReader(os.Stdin)
 	n, err := r.ReadString('\n')
-
 	if err != nil {
 		fmt.Print("Error reading input")
 		return err
@@ -55,7 +55,6 @@ func firstTimeSetup() error {
 	fmt.Print("Email: ")
 	r = bufio.NewReader(os.Stdin)
 	e, err := r.ReadString('\n')
-
 	if err != nil {
 		fmt.Println("Error reading input")
 		return err
@@ -86,12 +85,27 @@ func generateUsrConfig(usr *User) error {
 		return err
 	}
 
-	err = os.WriteFile(".magikit/usrconfig/config", []byte(usr.email), 0755)
+	err = os.Mkdir(".magikit/objs", 0755)
+	if err != nil {
+		return err
+	}
+
+	err = initializeConfigINI(".magikit/usrconfig", usr)
 	if err != nil {
 		return err
 	}
 
 	err = os.WriteFile(".magikit/DO_NOT_EDIT_THIS_FOLDER_CONTENTS", []byte(DO_NOT_EDIT_THIS_FOLDER_CONTENTS), 0755)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(".magikit/stage.ini", []byte(""), 0755)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(".magikit/HEAD", []byte(""), 0755)
 	if err != nil {
 		return err
 	}
